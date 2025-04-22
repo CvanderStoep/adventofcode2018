@@ -1,9 +1,9 @@
 # created by virtualenv automatically
 # PyCharm
-.idea/*
+.idea/
 
 # Virtual environments
-.venv/*
+.venv/
 
 # Caches
 __pycache__/
