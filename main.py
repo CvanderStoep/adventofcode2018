@@ -1,8 +1,7 @@
-def get_common_letters(s1: str, s2: str) -> str:
-    """Returns common characters between two strings, excluding the differing one."""
-    return ''.join(c1 for c1, c2 in zip(s1, s2) if c1 == c2)
+def remove_letter_a(text: str) -> str:
+    return text.replace('a', '').replace('A', '')
 
 # Example usage:
-s1 = "fghij"
-s2 = "fguij"
-print(get_common_letters(s1, s2))  # Output: "fgij"
+input_string = "Advent of Code is amazing!"
+output_string = remove_letter_a(input_string)
+print(output_string)  # "dvent of Code is mzing!"
