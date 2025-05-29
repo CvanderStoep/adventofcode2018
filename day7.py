@@ -54,7 +54,7 @@ class SortedTopology:
 
 
 def _duration(element) -> int:
-    return ord(element) - ord('A') + 61
+    return ord(element) - ord('A') + 1
 
 
 class Workbench:
@@ -101,9 +101,9 @@ class Workbench:
 
 def compute_part_one(file_name: str) -> Generator[str]:
     content = read_input_file(file_name)
-    graph, dependencies = convert_to_graph(content)
+    dependents, dependencies = convert_to_graph(content)
 
-    topo = SortedTopology(graph, dependencies)
+    topo = SortedTopology(dependents, dependencies)
 
     while not topo.empty():
         element = topo.pop()
@@ -114,7 +114,7 @@ def compute_part_one(file_name: str) -> Generator[str]:
 def compute_part_two(file_name: str) -> Generator[(str, int)]:
     content = read_input_file(file_name)
     dependents, dependencies = convert_to_graph(content)
-    number_of_workers = 5
+    number_of_workers = 2
 
     topology = SortedTopology(dependents, dependencies)
     workbench = Workbench(number_of_workers)
