@@ -19,6 +19,7 @@ def compute_part_one(file_name: str) -> None:
 
     maxX = max(coordinates, key=lambda c: c[0])[0] + 1
     maxY = max(coordinates, key=lambda c: c[1])[1] + 1
+    # max_x = max(c[0] for c in coordinates)
     coordinate_areas = [0] * len(coordinates)
     part_two_area = 0
 
@@ -36,11 +37,13 @@ def compute_part_one(file_name: str) -> None:
                     closest_coord = -1  # tie between several coords
 
                 total_distance += distance
-            coordinate_areas[closest_coord] += 1
+            if closest_coord != -1:
+                coordinate_areas[closest_coord] += 1
             if total_distance < 10000:
                 part_two_area += 1
 
 # sweep 2, include the edges and if the area changes, exclude it.
+# alternative solution, see day6-github
     coordinate_areas_edge = [0] * len(coordinates)
     for x in range(-1, maxX+1):
         for y in range(-1, maxY+1):
