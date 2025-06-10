@@ -39,6 +39,7 @@ def calculated_node_value(numbers: list, index: int) -> tuple[int, int]:
     for _ in range(number_children):
         index, child_value = calculated_node_value(numbers, index)
         children_values.append(child_value)
+        print(index, children_values)
 
     # Collect metadata entries
     meta_data = numbers[index:index + number_metadata]

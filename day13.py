@@ -12,6 +12,7 @@ class Cart:
     active: bool = True  # Flag to determine if a cart is still operational
 
 
+
 def read_input_file(file_name: str) -> defaultdict[Any, str]:
     with open(file_name) as f:
         content = f.read().splitlines()
@@ -31,17 +32,13 @@ def find_carts(grid: defaultdict) -> List[Cart]:
             grid[(x, y)] = '-' if value in '<>' else '|'
     return carts
 
-
 def move_carts(grid: defaultdict, carts: List[Cart]) -> None:
     directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
-    collision_points = set()
 
     carts.sort(key=lambda cart: (cart.y, cart.x))  # Ensure correct move order
-    # print(f'{carts[0]}')
 
-    for cart in carts:
+    for cart in carts: #sorted_carts:
         if not cart.active:
-            # print('cart not active')
             continue
 
         dx, dy = cart.direction
@@ -55,13 +52,11 @@ def move_carts(grid: defaultdict, carts: List[Cart]) -> None:
             for c in carts:
                 if c.x == nx and c.y == ny:
                     c.active = False
-            continue
 
-        # Update position
+
         cart.x, cart.y = nx, ny
         track = grid[(nx, ny)]
 
-        # Handle track curves
         curve_map = {
             '\\': {(1, 0): (0, 1), (-1, 0): (0, -1), (0, 1): (1, 0), (0, -1): (-1, 0)},
             '/': {(1, 0): (0, -1), (-1, 0): (0, 1), (0, 1): (-1, 0), (0, -1): (1, 0)}
@@ -83,7 +78,24 @@ def move_carts(grid: defaultdict, carts: List[Cart]) -> None:
             cart.direction = directions[direction_index]
 
 
-def compute_part_one(file_name: str) -> str:
+def print_grid(grid: defaultdict, carts: list) -> None:
+    min_x, min_y, max_x, max_y = 0, 0, 0, 0
+    for x, y in grid.keys():
+        min_x = min(x, min_x)
+        min_y = min(y, min_y)
+        max_x = max(x, max_x)
+        max_y = max(y, max_y)
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x + 1):
+            character = grid[(x,y)]
+            for cart in carts:
+                if (x, y) == (cart.x, cart.y):
+                    character = 'C'
+            print(character, end='')
+        print()
+
+
+def compute_part(file_name: str) -> str:
     grid = read_input_file(file_name)
     carts = find_carts(grid)
 
@@ -91,9 +103,12 @@ def compute_part_one(file_name: str) -> str:
         move_carts(grid, carts)
 
     last_cart = next(c for c in carts if c.active)
-    return f"{last_cart.x},{last_cart.y}"
+    return f"Part II: {last_cart.x},{last_cart.y}"
+
+
 
 
 if __name__ == '__main__':
     file_path = 'input/input13.txt'
-    print(f"Part I: {compute_part_one(file_path)}")
+    print('Part I:')
+    print(f"{compute_part(file_path)}")
