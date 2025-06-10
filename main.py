@@ -1,99 +1,37 @@
-from collections import defaultdict
-from dataclasses import dataclass
-from typing import Any, List
+def compute_part_one() -> str:
+    number_recipes = 147061
+    player1, player2 = 0, 1
+    recipes = [3, 7]
+
+    while len(recipes) < number_recipes + 10:
+        next_recipe = recipes[player1] + recipes[player2]
+        recipes.extend(divmod(next_recipe, 10) if next_recipe >= 10 else [next_recipe])
+
+        player1 = (player1 + 1 + recipes[player1]) % len(recipes)
+        player2 = (player2 + 1 + recipes[player2]) % len(recipes)
+
+    return ''.join(map(str, recipes[number_recipes:number_recipes + 10]))
 
 
-@dataclass
-class Cart:
-    x: int
-    y: int
-    direction: tuple
-    turn: int
-    active: bool = True  # Flag to determine if a cart is still operational
+def compute_part_two() -> int:
+    target = "147061"
+    player1, player2 = 0, 1
+    recipes = [3, 7]
+    recipe_str = "37"
+
+    while True:
+        next_recipe = recipes[player1] + recipes[player2]
+        for digit in divmod(next_recipe, 10) if next_recipe >= 10 else [next_recipe]:
+            recipes.append(digit)
+            recipe_str += str(digit)
+
+            if target in recipe_str[-len(target)-1:]:
+                return len(recipe_str) - len(target)
+
+        player1 = (player1 + 1 + recipes[player1]) % len(recipes)
+        player2 = (player2 + 1 + recipes[player2]) % len(recipes)
 
 
-def read_input_file(file_name: str) -> defaultdict[Any, str]:
-    with open(file_name) as f:
-        content = f.read().splitlines()
-    grid = defaultdict(str)
-    for y, line in enumerate(content):
-        for x, letter in enumerate(line):
-            grid[(x, y)] = letter
-    return grid
-
-
-def find_carts(grid: defaultdict) -> List[Cart]:
-    directions = {'>': (1, 0), '<': (-1, 0), 'v': (0, 1), '^': (0, -1)}
-    carts = []
-    for (x, y), value in grid.items():
-        if value in directions:
-            carts.append(Cart(x, y, directions[value], turn=-1))
-            grid[(x, y)] = '-' if value in '<>' else '|'
-    return carts
-
-
-def move_carts(grid: defaultdict, carts: List[Cart]) -> None:
-    directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
-    collision_points = set()
-
-    carts.sort(key=lambda cart: (cart.y, cart.x))  # Ensure correct move order
-    # print(f'{carts[0]}')
-
-    for cart in carts:
-        if not cart.active:
-            # print('cart not active')
-            continue
-
-        dx, dy = cart.direction
-        x, y = cart.x, cart.y
-        nx, ny = x + dx, y + dy
-
-        # Collision detection
-        if any(c.x == nx and c.y == ny and c.active for c in carts):
-            print(f"Collision at {nx},{ny}")
-            cart.active = False
-            for c in carts:
-                if c.x == nx and c.y == ny:
-                    c.active = False
-            continue
-
-        # Update position
-        cart.x, cart.y = nx, ny
-        track = grid[(nx, ny)]
-
-        # Handle track curves
-        curve_map = {
-            '\\': {(1, 0): (0, 1), (-1, 0): (0, -1), (0, 1): (1, 0), (0, -1): (-1, 0)},
-            '/': {(1, 0): (0, -1), (-1, 0): (0, 1), (0, 1): (-1, 0), (0, -1): (1, 0)}
-        }
-        if track in curve_map:
-            cart.direction = curve_map[track][cart.direction]
-
-        # Handle intersections
-        elif track == '+':
-            direction_index = directions.index(cart.direction)
-            if cart.turn == -1:
-                direction_index = (direction_index - 1) % 4  # Left turn
-                cart.turn = 0
-            elif cart.turn == 0:
-                cart.turn = 1  # Continue straight
-            elif cart.turn == 1:
-                direction_index = (direction_index + 1) % 4  # Right turn
-                cart.turn = -1
-            cart.direction = directions[direction_index]
-
-
-def compute_part_one(file_name: str) -> str:
-    grid = read_input_file(file_name)
-    carts = find_carts(grid)
-
-    while len([c for c in carts if c.active]) > 1:
-        move_carts(grid, carts)
-
-    last_cart = next(c for c in carts if c.active)
-    return f"{last_cart.x},{last_cart.y}"
-
-
-if __name__ == '__main__':
-    file_path = 'input/input13.txt'
-    print(f"Part I: {compute_part_one(file_path)}")
+if __name__ == "__main__":
+    print(f"Part I: {compute_part_one()}")
+    print(f"Part II: {compute_part_two()}")
