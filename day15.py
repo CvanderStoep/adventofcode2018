@@ -78,41 +78,27 @@ def is_reachable(player: Player, square: tuple, grid: defaultdict)-> tuple[bool,
                     queue.append((steps + 1, (nx, ny)))
     return False, None
 
-def shortest_path(player, square: tuple, grid: defaultdict) -> list[tuple[int, int]] | list[Any]:
+def shortest_path(player, square: tuple, grid: defaultdict) -> list[tuple[int, int]]:
     """find the shortest path from the player to the square respecting the reading order in case of a tie"""
 
-    directions = [(0, -1 ), (-1, 0), (1, 0), (0, 1)]  # Reading order
-    start = (player.x, player.y)
-    finish = square
-    visited = {}
-    queue = deque([(0, start, [start])])
-    min_steps = None
-    # best_path = None
+    directions = [(0, -1), (-1, 0), (1, 0), (0, 1)]
+    start, finish = (player.x, player.y), square
+    visited = set()
+    queue = deque([(start, [start])])
 
     while queue:
-        steps, (x, y), path = queue.popleft()
-        #
-        # if min_steps is not None and steps > min_steps:
-        #     print('hier')
-        #     break  # No shorter path will be found
-
+        (x, y), path = queue.popleft()
         if (x, y) == finish:
-            if min_steps is None or steps == min_steps:
-                # min_steps = steps
-                return path  # Return the first path found in reading order
+            return path
+        if (x, y) in visited:
             continue
-
-        if (x, y) in visited and visited[(x, y)] <= steps:
-            continue
-
-        visited[(x, y)] = steps
-
+        visited.add((x, y))
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
-            if grid[(nx, ny)] == '.':
-                queue.append((steps + 1, (nx, ny), path + [(nx, ny)]))
-
+            if grid[(nx, ny)] == '.' and (nx, ny) not in visited:
+                queue.append(((nx, ny), path + [(nx, ny)]))
     return []
+
 
 def attack_target(player, players, grid)-> None:
     directions = [(1,0), (-1,0), (0,1), (0,-1)]
@@ -260,61 +246,7 @@ def compute_part_one(file_name: str) -> tuple[int | Any, int, int | Any]:
             return rounds, hp, rounds * hp
 
 
-def compute_part_two(file_name: str) -> tuple[int | Any, int | Any, int, int | Any] | str:
-    grid = read_input_file(file_name)
-    print_grid(grid)
-
-    players = return_players(grid)
-    number_of_elves = sum(1 for player in players if player.type == 'E')
-    print(f'{number_of_elves= }')
-
-    elf_attack_power = 15
-
-    while True:
-        elf_attack_power += 1
-        print(f'{elf_attack_power= }')
-        grid = read_input_file(file_name)
-        players = return_players(grid)
-
-        for player in players:
-            if player.type == 'E':
-                player.power = elf_attack_power
-
-        rounds = 1
-        while True:
-            # print(f'{rounds= }')
-            game_status = play_round(players, grid)
-            players = remove_dead_players(grid, players)
-
-            if not game_status:
-                print('game has ended early at round', rounds -1)
-                number_of_remaining_elves = sum(1 for player in players if player.type == 'E')
-                print(f'{number_of_remaining_elves= }')
-                hp = sum(player.hp for player in players)
-                if number_of_elves == number_of_remaining_elves:
-                    print_grid(grid)
-                    return elf_attack_power, rounds-1, hp, (rounds-1) * hp
-                else:
-                    break
-
-            game_status = check_game_status(grid)
-
-            if game_status:
-                # game can go on
-                rounds += 1
-            else:
-                print('game has ended at round', rounds)
-                number_of_remaining_elves = sum(1 for player in players if player.type == 'E')
-                print(f'{number_of_remaining_elves= }')
-                hp = sum(player.hp for player in players)
-                if number_of_elves == number_of_remaining_elves:
-                    print_grid(grid)
-                    return elf_attack_power, rounds, hp, rounds * hp
-                else:
-                    break
-
 
 if __name__ == '__main__':
     file_path = 'input/input15.txt'
     print(f"Part I: {compute_part_one(file_path)}")
-    # print(f"Part II: {compute_part_two(file_path)}")

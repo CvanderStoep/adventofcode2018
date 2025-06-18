@@ -1,5 +1,6 @@
 from collections import defaultdict, deque
 from dataclasses import dataclass
+from itertools import count
 from typing import Any
 
 def print_grid(grid: defaultdict) -> None:
@@ -158,10 +159,8 @@ def check_game_status(grid):
 def compute_part_two(file_name: str):
     original_grid = read_input_file(file_name)
     base_elf_count = sum(1 for v in original_grid.values() if v == 'E')
-    elf_power = 3
 
-    while True:
-        elf_power += 1
+    for elf_power in count(3):
         print(f'{elf_power= }')
         grid = read_input_file(file_name)
         players = return_players(grid)
