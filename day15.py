@@ -133,6 +133,8 @@ def attack_target(player, players, grid)-> None:
     # sort target by minimum hp
     # select equal target by reading order
     # apply damage to target
+    if len(targets) == 0:
+        return
     min_hp = min(target.hp for target in targets)
 
     targets = [target for target in targets if target.hp == min_hp]
@@ -191,11 +193,11 @@ def play_round(players, grid) -> bool | None:
 def remove_dead_players(grid, players) -> list[Any]:
     """"remove dead players from the players list and from the grid"""
     new_players = []
-    print(players)
+    # print(players)
     for player in players:
         if not player.alive:
             grid[(player.x, player.y)] = '.'
-            print(f'Dead: {player= }')
+            # print(f'Dead: {player= }')
         else:
             new_players.append(player)
     return new_players
@@ -256,12 +258,65 @@ def compute_part_one(file_name: str) -> tuple[int | Any, int, int | Any]:
             hp = sum(player.hp for player in players)
             return rounds, hp, rounds * hp
 
-def compute_part_two(file_name: str) -> str:
-    content = read_input_file(file_name)
-    return "part 2 not yet implemented"
+
+def compute_part_two(file_name: str) -> None | tuple[int | Any, int, int | Any] | int:
+    grid = read_input_file(file_name)
+    print_grid(grid)
+
+    players = return_players(grid)
+    number_of_elves = sum(1 for player in players if player.type == 'E')
+    print(f'{number_of_elves= }')
+
+    elf_attack_power = 15
+
+    while True:
+        elf_attack_power += 1
+        print(f'{elf_attack_power= }')
+        grid = read_input_file(file_name)
+        players = return_players(grid)
+
+        for player in players:
+            if player.type == 'E':
+                player.power = elf_attack_power
+
+        rounds = 1
+        while True:
+            # print(f'{rounds= }')
+            game_status = play_round(players, grid)
+            players = remove_dead_players(grid, players)
+
+            if not game_status:
+                print('game has ended early at round', rounds -1)
+                number_of_remaining_elves = sum(1 for player in players if player.type == 'E')
+                print(f'{number_of_remaining_elves= }')
+                hp = sum(player.hp for player in players)
+                if number_of_elves == number_of_remaining_elves:
+                    print_grid(grid)
+                    return elf_attack_power, rounds-1, hp, (rounds-1) * hp
+                else:
+                    break
+
+            game_status = check_game_status(grid)
+
+            if game_status:
+                # game can go on
+                rounds += 1
+            else:
+                print('game has ended at round', rounds)
+                number_of_remaining_elves = sum(1 for player in players if player.type == 'E')
+                print(f'{number_of_remaining_elves= }')
+                hp = sum(player.hp for player in players)
+                if number_of_elves == number_of_remaining_elves:
+                    print_grid(grid)
+                    return elf_attack_power, rounds, hp, rounds * hp
+                else:
+                    break
+
+    return 'not yet'
+
 
 
 if __name__ == '__main__':
     file_path = 'input/input15.txt'
     print(f"Part I: {compute_part_one(file_path)}")
-    print(f"Part II: {compute_part_two(file_path)}")
+    # print(f"Part II: {compute_part_two(file_path)}")
