@@ -48,7 +48,7 @@ def find_targets(player: Player, players: list) -> list:
             targets.append(target)
     return targets
 
-def get_target_neighbours(target: Player, grid: defaultdict)-> list:
+def get_target_neighbours(target: Player, grid: defaultdict)-> list[tuple]:
     directions = [(1,0), (-1,0), (0,1), (0,-1)]
     neighbours = []
     x, y = target.x, target.y
@@ -59,7 +59,7 @@ def get_target_neighbours(target: Player, grid: defaultdict)-> list:
     return neighbours
 
 def is_reachable(player: Player, square: tuple, grid: defaultdict)-> tuple[bool, int] | tuple[bool, None]:
-    """"can you reach a specific square from the player using BFS"""
+    """can you reach a specific square from the player using BFS"""
     directions = [(1,0), (-1,0), (0,1), (0,-1)]
     start = player.x, player.y
     finish = square[0], square[1]
@@ -79,7 +79,7 @@ def is_reachable(player: Player, square: tuple, grid: defaultdict)-> tuple[bool,
     return False, None
 
 def shortest_path(player, square: tuple, grid: defaultdict) -> list[tuple[int, int]] | list[Any]:
-    """"find the shortest path from the player to the square respecting the reading order in case of a tie"""
+    """find the shortest path from the player to the square respecting the reading order in case of a tie"""
 
     directions = [(0, -1 ), (-1, 0), (1, 0), (0, 1)]  # Reading order
     start = (player.x, player.y)
@@ -91,9 +91,10 @@ def shortest_path(player, square: tuple, grid: defaultdict) -> list[tuple[int, i
 
     while queue:
         steps, (x, y), path = queue.popleft()
-
-        if min_steps is not None and steps > min_steps:
-            break  # No shorter path will be found
+        #
+        # if min_steps is not None and steps > min_steps:
+        #     print('hier')
+        #     break  # No shorter path will be found
 
         if (x, y) == finish:
             if min_steps is None or steps == min_steps:
@@ -191,7 +192,7 @@ def play_round(players, grid) -> bool | None:
     return True
 
 def remove_dead_players(grid, players) -> list[Any]:
-    """"remove dead players from the players list and from the grid"""
+    """remove dead players from the players list and from the grid"""
     new_players = []
     # print(players)
     for player in players:
@@ -259,7 +260,7 @@ def compute_part_one(file_name: str) -> tuple[int | Any, int, int | Any]:
             return rounds, hp, rounds * hp
 
 
-def compute_part_two(file_name: str) -> None | tuple[int | Any, int, int | Any] | int:
+def compute_part_two(file_name: str) -> tuple[int | Any, int | Any, int, int | Any] | str:
     grid = read_input_file(file_name)
     print_grid(grid)
 
@@ -311,9 +312,6 @@ def compute_part_two(file_name: str) -> None | tuple[int | Any, int, int | Any] 
                     return elf_attack_power, rounds, hp, rounds * hp
                 else:
                     break
-
-    return 'not yet'
-
 
 
 if __name__ == '__main__':
