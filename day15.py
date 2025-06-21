@@ -183,7 +183,8 @@ def remove_dead_players(grid, players) -> list[Any]:
     # print(players)
     for player in players:
         if not player.alive:
-            grid[(player.x, player.y)] = '.'
+            pass
+            # grid[(player.x, player.y)] = '.'
             # print(f'Dead: {player= }')
         else:
             new_players.append(player)
