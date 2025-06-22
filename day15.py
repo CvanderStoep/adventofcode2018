@@ -32,21 +32,23 @@ class Player:
     alive: bool = True
     power: int = 3
 
-def return_players(grid: defaultdict) -> list:
+def return_initial_list_of_players(grid: defaultdict) -> list[Player]:
     players = []
     for (x,y), value in grid.items():
         if value in "GE":
             players.append(Player(value, x, y))
     return players
 
-def find_targets(player: Player, players: list) -> list:
-    targets = []
-    for target in players:
-        if not target.alive:
-            continue
-        if player.type != target.type:
-            targets.append(target)
-    return targets
+def find_targets(player: Player, players: list) -> list[Player]:
+    # targets = []
+    # for target in players:
+    #     if not target.alive:
+    #         continue
+    #     if player.type != target.type:
+    #         targets.append(target)
+    # return targets
+    return [p for p in players if  p.alive and  p.type != player.type]
+
 
 def get_target_neighbours(target: Player, grid: defaultdict)-> list[tuple]:
     directions = [(1,0), (-1,0), (0,1), (0,-1)]
@@ -177,7 +179,7 @@ def play_round(players, grid) -> bool | None:
             pass
     return True
 
-def remove_dead_players(grid, players) -> list[Any]:
+def remove_dead_players_(grid, players) -> list[Any]:
     """remove dead players from the players list and from the grid"""
     new_players = []
     # print(players)
@@ -189,6 +191,9 @@ def remove_dead_players(grid, players) -> list[Any]:
         else:
             new_players.append(player)
     return new_players
+
+def remove_dead_players(grid, players) -> list:
+    return [p for p in players if p.alive]
 
 def check_game_status(grid):
     race_set = {v for v in grid.values() if v in {'E', 'G'}}
@@ -222,7 +227,7 @@ def compute_part_one(file_name: str) -> tuple[int | Any, int, int | Any]:
     grid = read_input_file(file_name)
     print_grid(grid)
 
-    players = return_players(grid)
+    players = return_initial_list_of_players(grid)
     players.sort(key=lambda player: (player.y, player.x))
 
     rounds = 1
