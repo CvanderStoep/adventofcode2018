@@ -70,8 +70,7 @@ def grid_size(grid: dict ) -> tuple:
 def find_edges(grid: dict, coordinate: tuple, size: tuple ) -> tuple:
     left_edge, right_edge = None, None
     x, y = coordinate
-    # xs, ys = zip(*grid.keys())
-    min_x, min_y, max_x, max_y = size # min(xs), min(ys), max(xs), max(ys)
+    min_x, min_y, max_x, max_y = size
     for i in range(x, min_x-2, -1):
         if grid[(i,y)] in '.|' and grid[(i, y+1)] == '#':
             left_edge = (i - 1, y)
@@ -84,11 +83,16 @@ def find_edges(grid: dict, coordinate: tuple, size: tuple ) -> tuple:
     return left_edge, right_edge
 
 def water_count(grid: dict) -> int:
+    y_min = 1000
+    for coordinate, value in grid.items():
+        if value == '#':
+            y_min = min(y_min, coordinate[1])
+
     wc = 0
     for c in grid.values():
         if c in '~|':
             wc += 1
-    return wc
+    return wc - y_min
 
 def fill_water_layer(grid: dict, left_wall: tuple, right_wall: tuple) -> dict:
     xl, xr = left_wall[0], right_wall[0]
@@ -106,8 +110,7 @@ def fill_running_water(grid: dict, left: tuple, right: tuple) -> dict:
 
 def below_max_y_value(grid, coordinate: tuple, size: tuple) -> bool:
     x, y = coordinate
-    # xs, ys = zip(*grid.keys())
-    min_x, min_y, max_x, max_y = size # min(xs), min(ys), max(xs), max(ys)
+    min_x, min_y, max_x, max_y = size
     if y > max_y:
         return True
 
@@ -119,18 +122,11 @@ def compute_part_one(file_name: str) -> str:
     queue = deque([water_spring])
     print(f'{content= }')
     grid = transform_input_to_grid(content)
-    # print(grid)
-    # print_grid(grid, water_spring)
-    # input()
     size = grid_size(grid)
     print(f'{size =}')
 
-    # put water spring in queue
-    # find 2 walls and fill level with water
-    # otherwise, put left and/or right edge as water spring in queue
     visited = set()
     while queue:
-        # print(f'{len(queue)= }')
         water_spring = queue.popleft()
         for t in count(1):
             if grid[water_spring] != '~':
@@ -138,25 +134,19 @@ def compute_part_one(file_name: str) -> str:
             visited.add(water_spring)
             water_spring = (water_spring[0], water_spring[1] + 1)
             if below_max_y_value(grid, water_spring, size):
-                print('program can stop here')
-                # print_grid(grid, water_spring)
+                # print('flow can stop here')
                 break
 
             if grid[water_spring] in '~#':
-                # print(t, water_spring, grid[water_spring])
                 left_wall, right_wall = find_walls(grid, (water_spring[0], water_spring[1] -1), size)
                 if left_wall is not None and right_wall is not None:
-                    # print(f'{left_wall, right_wall= }')
                     grid = fill_water_layer(grid, left_wall, right_wall)
                     water_spring = (water_spring[0], water_spring[1] - 2)
-                    # print_grid(grid, water_spring)
                     queue.append(water_spring)
                     visited.add(water_spring)
                     break
                 else:
                     left_edge, right_edge = find_edges(grid, (water_spring[0], water_spring[1] -1), size)
-                    # print(f'{left_wall, right_wall= }')
-                    # print(f'{left_edge, right_edge= }')
                     if left_wall is not None:
                         if right_edge not in visited:
                             queue.append(right_edge)
@@ -181,18 +171,13 @@ def compute_part_one(file_name: str) -> str:
 
 
     print_grid(grid, water_spring)
-    print(f'{water_count(grid)= }')
-    print(Counter(grid.values()))
+    counter = Counter(grid.values())
 
-    return "part 1 not yet implemented"
+    print(f' partI:  {water_count(grid)= }')
+    print(f' partII: {counter['~']= }')
 
-
-def compute_part_two(file_name: str) -> str:
-    content = read_input_file(file_name)
-    return "part 2 not yet implemented"
 
 
 if __name__ == '__main__':
     file_path = 'input/input17.txt'
-    print(f"Part I: {compute_part_one(file_path)}")
-    print(f"Part II: {compute_part_two(file_path)}")
+    compute_part_one(file_path)
