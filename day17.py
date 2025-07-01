@@ -1,5 +1,5 @@
 import re
-from collections import defaultdict, deque
+from collections import defaultdict, deque, Counter
 from itertools import count
 
 
@@ -17,7 +17,7 @@ def print_grid(grid: defaultdict, water_spring: tuple, partly: bool = False) -> 
     miny, maxy = min(ys), max(ys)
 
     if partly:
-        minx, maxx, miny, maxy = 450, 550, 0, 100
+        minx, maxx, miny, maxy = 350, 550, 0, 100
     for y in range(miny, maxy + 1):
         for x in range(minx, maxx + 1):
             if x == xw and y == yw:
@@ -120,7 +120,7 @@ def compute_part_one(file_name: str) -> str:
     print(f'{content= }')
     grid = transform_input_to_grid(content)
     # print(grid)
-    print_grid(grid, water_spring, partly=False)
+    # print_grid(grid, water_spring)
     # input()
     size = grid_size(grid)
     print(f'{size =}')
@@ -128,16 +128,18 @@ def compute_part_one(file_name: str) -> str:
     # put water spring in queue
     # find 2 walls and fill level with water
     # otherwise, put left and/or right edge as water spring in queue
+    visited = set()
     while queue:
-        print(f'{len(queue)= }')
+        # print(f'{len(queue)= }')
         water_spring = queue.popleft()
         for t in count(1):
-            grid[water_spring] = '|'
+            if grid[water_spring] != '~':
+                grid[water_spring] = '|'
+            visited.add(water_spring)
             water_spring = (water_spring[0], water_spring[1] + 1)
             if below_max_y_value(grid, water_spring, size):
                 print('program can stop here')
-                print_grid(grid, water_spring)
-                print(f'{water_count(grid) -1 = }')
+                # print_grid(grid, water_spring)
                 break
 
             if grid[water_spring] in '~#':
@@ -147,33 +149,40 @@ def compute_part_one(file_name: str) -> str:
                     # print(f'{left_wall, right_wall= }')
                     grid = fill_water_layer(grid, left_wall, right_wall)
                     water_spring = (water_spring[0], water_spring[1] - 2)
-                    print_grid(grid, water_spring, partly=False)
+                    # print_grid(grid, water_spring)
                     queue.append(water_spring)
+                    visited.add(water_spring)
                     break
                 else:
                     left_edge, right_edge = find_edges(grid, (water_spring[0], water_spring[1] -1), size)
-                    print(f'{left_wall, right_wall= }')
-                    print(f'{left_edge, right_edge= }')
-                    if left_edge is not None:
-                        queue.append(left_edge)
-                    if right_edge is not None:
-                        queue.append(right_edge)
-                    if left_edge is not None and right_edge is not None:
-                        fill_running_water(grid, left_edge, right_edge)
-                    if left_edge is not None and right_wall is not None:
-                        fill_running_water(grid, left_edge, (right_wall[0]-1, right_wall[1]))
-                    if left_wall is not None and right_edge is not None:
+                    # print(f'{left_wall, right_wall= }')
+                    # print(f'{left_edge, right_edge= }')
+                    if left_wall is not None:
+                        if right_edge not in visited:
+                            queue.append(right_edge)
+                            visited.add(right_edge)
                         fill_running_water(grid, (left_wall[0] +1, left_wall[1]), right_edge)
+                    elif right_wall is not None:
+                        if left_edge not in visited:
+                            queue.append(left_edge)
+                            visited.add(left_edge)
+                        fill_running_water(grid, left_edge, (right_wall[0]-1, right_wall[1]))
+                    else:
+                        if right_edge not in visited:
+                            queue.append(right_edge)
+                            visited.add(right_edge)
 
+                        if left_edge not in visited:
+                            queue.append(left_edge)
+                            visited.add(left_edge)
+
+                        fill_running_water(grid, left_edge, right_edge)
                     break
 
 
-
-
-
-
-
-
+    print_grid(grid, water_spring)
+    print(f'{water_count(grid)= }')
+    print(Counter(grid.values()))
 
     return "part 1 not yet implemented"
 
