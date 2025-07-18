@@ -85,7 +85,7 @@ def compute_part_one(file_name: str) -> str:
 
     return f'{wood * lumberyard= }'
 
-def compute_part_two(file_name: str) -> str:
+def compute_part_two_old(file_name: str) -> str:
     lumber_area = read_input_file(file_name)
     print(f'{lumber_area= }')
     print(get_neighbors(lumber_area, (0,0)))
@@ -110,6 +110,41 @@ def compute_part_two(file_name: str) -> str:
     lumberyard = counter['#']
 
     return f'{wood * lumberyard= }'
+
+def compute_part_two(file_name: str) -> str | None:
+    lumber_area = read_input_file(file_name)
+    max_x = max(x for x, _ in lumber_area)
+    max_y = max(y for _, y in lumber_area)
+
+    def serialize(area):
+        # Flatten the grid into a string for hashing
+        return ''.join(area[(x, y)] for y in range(max_y + 1) for x in range(max_x + 1))
+
+    seen_states = dict()  # Maps serialized state to minute
+    states = []  # Indexed list of states by minute
+
+    for minute in count(0):
+        if minute % 10 == 0:
+            print(f'{minute= }')
+        state_key = serialize(lumber_area)
+        if state_key in seen_states:
+            cycle_start = seen_states[state_key]
+            cycle_length = minute - cycle_start
+            target_minute = (1_000_000_000 - cycle_start) % cycle_length + cycle_start
+            final_state = states[target_minute]
+
+            counter = Counter(final_state)
+            wood = counter['|']
+            lumberyard = counter['#']
+            print(f'After {minute} minutes:')
+            print_area(lumber_area)
+
+            return f'{wood * lumberyard= }'
+
+        seen_states[state_key] = minute
+        states.append(Counter(lumber_area.values()))
+        lumber_area = update_state(lumber_area)
+    return None
 
 
 if __name__ == '__main__':
