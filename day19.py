@@ -94,6 +94,7 @@ def compute_part_two():
 
     return sum(get_factors(part2_target))
 
+
 if __name__ == '__main__':
     file_name = 'input/input19.txt'
     print(f"Part I: {compute_part_one(file_name)}")
