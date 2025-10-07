@@ -1,7 +1,4 @@
 from typing import Dict, Any
-import re
-from z3 import *
-
 
 
 def read_and_parse_input(file_name: str) -> tuple[int, list[Any]]:
@@ -78,10 +75,10 @@ def compute_part_one(file_name: str) -> str:
 
     return f'{register[0]= }'
 
-# solution found via reddit
+# solution found via reddit & github
 # part 2 actually calculated the sum of the factors of a value that is kept in register[3]
 def compute_part_two():
-    part2_target = 10551408
+    part2_target = 10551408  #this is the value of register[3] after init.
     # Fast mode, sum the factors of the number.
     def get_factors(num):
         factors = []
