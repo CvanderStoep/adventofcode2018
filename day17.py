@@ -65,8 +65,6 @@ def grid_size(grid: dict ) -> tuple:
     min_x, min_y, max_x, max_y = min(xs), min(ys), max(xs), max(ys)
     return min_x, min_y, max_x, max_y
 
-
-
 def find_edges(grid: dict, coordinate: tuple, size: tuple ) -> tuple:
     left_edge, right_edge = None, None
     x, y = coordinate
@@ -94,6 +92,14 @@ def water_count(grid: dict) -> int:
             wc += 1
     return wc - y_min
 
+# alternative
+# def water_count(grid: dict, min_y: int, max_y: int) -> int:
+#     return sum(1 for (x, y), v in grid.items() if min_y <= y <= max_y and v in '~|')
+
+# def settled_water_count(grid: dict, min_y: int, max_y: int) -> int:
+#     return sum(1 for (x, y), v in grid.items() if min_y <= y <= max_y and v == '~')
+
+
 def fill_water_layer(grid: dict, left_wall: tuple, right_wall: tuple) -> dict:
     xl, xr = left_wall[0], right_wall[0]
     y = left_wall[1]
@@ -120,10 +126,10 @@ def compute_part_one(file_name: str) -> str:
     content = read_input_file(file_name)
     water_spring = (500, 0)
     queue = deque([water_spring])
-    print(f'{content= }')
+    # print(f'{content= }')
     grid = transform_input_to_grid(content)
     size = grid_size(grid)
-    print(f'{size =}')
+    # print(f'{size =}')
 
     visited = set()
     while queue:
@@ -174,8 +180,7 @@ def compute_part_one(file_name: str) -> str:
     counter = Counter(grid.values())
 
     print(f' partI:  {water_count(grid)= }')
-    print(f' partII: {counter['~']= }')
-
+    print(f" partII: settled water = {counter['~']}")
 
 
 if __name__ == '__main__':
