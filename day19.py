@@ -75,7 +75,7 @@ def compute_part_one(file_name: str) -> str:
 
     return f'{register[0]= }'
 
-# solution found via reddit & github
+# solution found via reddit & GitHub
 # part 2 actually calculated the sum of the factors of a value that is kept in register[3]
 def compute_part_two():
     part2_target = 10551408  #this is the value of register[3] after init.
