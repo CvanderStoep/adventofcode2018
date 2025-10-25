@@ -55,25 +55,30 @@ def process_instruction(opcode: str, instructions: list, register: Dict) -> None
         register[C] = int(register[A] == register[B])
 
 
-def compute_part_one(file_name: str) -> str:
+def compute_part_one(file_name: str) -> str | None:
     register_bound, all_instructions = read_and_parse_input(file_name)
-    register = {0: 0, 1: 0, 2: 0, 3: 0, 4:0, 5: 0}
+    for start_register_value in range(12935350,13935360):
+        number_iterations = 0
+        register = {0: start_register_value, 1: 0, 2: 0, 3: 0, 4:0, 5: 0}
 
-    print(register_bound, all_instructions)
-    ip = 0
-    while ip < len(all_instructions):
-        register[register_bound] = ip
-        instruction = all_instructions[ip]
-        opcode = instruction[0]
-        instructions = instruction[1:]
-        process_instruction(opcode, instructions, register)
-        ip = register[register_bound]
-        ip += 1
-        # print(ip)
+        # print(register_bound, all_instructions)
+        ip = 0
+        while ip < len(all_instructions) and number_iterations < 2000 :
+            # print(start_register_value, number_iterations)
+            register[register_bound] = ip
+            instruction = all_instructions[ip]
+            opcode = instruction[0]
+            instructions = instruction[1:]
+            process_instruction(opcode, instructions, register)
+            ip = register[register_bound]
+            ip += 1
+            number_iterations += 1
+            if ip >= len(all_instructions):
+                print('found it')
+                # print(f"{opcode, instructions, register= }")
+                return f'{number_iterations, start_register_value, register= }'
+    return None
 
-    print(f"{opcode, instructions, register= }")
-
-    return f'{register[0]= }'
 
 # solution found via reddit & GitHub
 # part 2 actually calculated the sum of the factors of a value that is kept in register[3]
@@ -94,4 +99,4 @@ def compute_part_two():
 if __name__ == '__main__':
     file_name = 'input/input21.txt'
     print(f"Part I: {compute_part_one(file_name)}")
-    print(f"Part II: {compute_part_two()}")
+    # print(f"Part II: {compute_part_two()}")

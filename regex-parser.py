@@ -2,7 +2,6 @@ def parse_regex(expr):
     def parse(i):
         result = ['']
         while i < len(expr):
-            print(i)
             if expr[i] == '(':
                 sub_result, i = parse(i + 1)
                 result = [r + s for r in result for s in sub_result]

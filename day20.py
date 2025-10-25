@@ -52,20 +52,22 @@ def process_route(route: str, maze: defaultdict) -> None:
 def process_route2(regex: str) -> int:
     # solution from reddit
 
-    d = defaultdict(lambda: 1e9)
-    p = d[0] = 0
-    s = []
+    position_dictionary = defaultdict(lambda: 1e9)
+    position = position_dictionary[0] = 0
+    position_stack = []
     for c in regex:
         if '(' == c:
-            s.append(p)
+            position_stack.append(position)
         elif ')' == c:
-            p = s.pop()
+            position = position_stack.pop()
         elif '|' == c:
-            p = s[-1]
+            position = position_stack[-1]
         else:
-            l = p;p += 1j ** 'ESWN'.index(c);d[p] = min(d[p], d[l] + 1)
-    v = d.values()
-    print(max(v), sum(x >= 1e3 for x in v))
+            old_position = position
+            position += 1j ** 'ESWN'.index(c) # use complex algebra to update the position
+            position_dictionary[position] = min(position_dictionary[position], position_dictionary[old_position] + 1)
+    v = position_dictionary.values()
+    print(max(v), sum(x >= 1000 for x in v))
 
 
 def compute_part_one(file_name: str) -> str:
