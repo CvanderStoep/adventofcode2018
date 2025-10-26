@@ -17,12 +17,13 @@ def read_input_file(file_name: str) -> tuple[int, int, int]:
 
     return depth, x, y
 
-def calculate_geological_index_and_erosion_level(geological_index, erosion_level, x_target, y_target, depth) -> \
-defaultdict[Any, int]:
+def calculate_region_type(x_target, y_target, depth) -> defaultdict[Any, int]:
 
     buffer = 100  # extra space to allow detours
     max_x, max_y = x_target + buffer, y_target + buffer
 
+    geological_index = defaultdict(int)
+    erosion_level = defaultdict(int)
     region_type = defaultdict(int)
     for x in range(max_x + 1):
         for y in range(max_y + 1):
@@ -43,15 +44,12 @@ defaultdict[Any, int]:
 
 def compute_part_one(file_name: str) -> str:
     depth, x_target, y_target = read_input_file(file_name)
-    geological_index = defaultdict(int)
-    erosion_level = defaultdict(int)
-    region_type = calculate_geological_index_and_erosion_level(geological_index, erosion_level, x_target, y_target, depth)
-    x, y = (0, 0)
+
+    region_type = calculate_region_type(x_target, y_target, depth)
 
     total_risk = 0
     for x in range(x_target + 1):
         for y in range(y_target + 1):
-            # total_risk += erosion_level[(x, y)] % 3
             total_risk += region_type[(x, y)]
 
     return f'{total_risk=}'
@@ -59,11 +57,7 @@ def compute_part_one(file_name: str) -> str:
 def compute_part_two(file_name: str) -> str:
     depth, x_target, y_target = read_input_file(file_name)
 
-    geological_index = defaultdict(int)
-    erosion_level = defaultdict(int)
-    region_type = calculate_geological_index_and_erosion_level(
-        geological_index, erosion_level, x_target, y_target, depth
-    )
+    region_type = calculate_region_type(x_target, y_target, depth)
     # Allowed gear per region type
     allowed = {
         0: {1, 2},  # Rocky: Torch, Climbing Gear
@@ -76,7 +70,6 @@ def compute_part_two(file_name: str) -> str:
     visited = {}
 
     while heap:
-        # print(len(heap))
         time, x, y, gear = heapq.heappop(heap)
 
         if (x, y, gear) in visited and visited[(x, y, gear)] <= time:
