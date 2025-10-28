@@ -15,6 +15,7 @@ class Group:
     def effective_power(self) -> int:
         return self.units * self.attack_damage
 
+
 @dataclass
 class Army:
     name: str
