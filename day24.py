@@ -26,8 +26,7 @@ def calculate_damage(group1: Group, group2: Group)-> int:
     if group1.attack_type in group2.immunities:
         damage = 0
     elif group1.attack_type in group2.weaknesses:
-        damage *=2
-
+        damage *= 2
 
     return damage
 
@@ -177,7 +176,6 @@ def compute_part_two(file_name: str) -> str | None:
                 # Stalemate detected
                 break
 
-        remaining_units = sum(g.units for g in immune_system.groups + infection.groups)
         remaining_immunities = sum(g.units for g in immune_system.groups)
         remaining_infection = sum(g.units for g in infection.groups)
         if remaining_immunities > 0 and remaining_infection == 0:
